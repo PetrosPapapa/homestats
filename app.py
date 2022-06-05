@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-import secrets as ss
+import appsecrets as ss
 
 engine = create_engine(f'mysql+pymysql://{ss.db["username"]}:{ss.db["password"]}]@{ss.db["host"]}:{ss.db["port"]}/{ss.db["database"]}', pool_recycle=3600) #, echo=True)
 Base = declarative_base(engine)
