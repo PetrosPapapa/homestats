@@ -15,4 +15,4 @@ RUN apt-get remove -y --purge make gcc build-essential \
     && find /usr/local/lib/python3.9 -name "*.pyc" -type f -delete
 
 COPY . ./
-CMD gunicorn -b 0.0.0.0:80 app:server
+CMD gunicorn -b 0.0.0.0:80 app.app:server
