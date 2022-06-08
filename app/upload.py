@@ -37,30 +37,51 @@ app.layout = html.Div([
     html.Div(id='output-data-upload'),
 ])
 
+class InvalidTransactionFile(Exception):
+    pass
+
+
+def parse_csv(content):
+    df = pd.read_csv(
+        content, 
+        parse_dates=['Date'], 
+        dayfirst=True,
+        index_col=False,
+        na_values=[''],
+        skipinitialspace=True
+    )
+
+    # Check columns are as expected
+    expected_columns = ["Date", "Type", "Description", "Value", "Balance", "Account Name", "Account Number"]
+    actual_columns = list(df.columns.values)
+    if (expected_columns != actual_columns):
+        raise InvalidTransactionFile("Invalid columns: " + str(actual_columns) + " - need: " + str(expected_columns) )
+
+    # Strip "balance" rows
+    df = df[df["Type"].notna()]
+    
+    return df
+
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
     try:
         if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')), 
-                parse_dates=['Date'], 
-                dayfirst=True,
-                index_col=False )
-        elif 'xls' in filename:
-            # Assume that the user uploaded an excel file
-            df = pd.read_excel(io.BytesIO(decoded))
+            df = parse_csv(io.StringIO(decoded.decode('utf-8')))
+        else:
+            raise InvalidTransactionFile("Not a csv file")
     except Exception as e:
-        print(e)
+        err = "Error [" + filename + "]: " + str(e)
+        print(err)
         return html.Div([
-            'There was an error processing this file.'
+            err
         ])
 
     return html.Div([
-        html.H5(filename),
+        html.H4(filename),
         html.H6(datetime.datetime.fromtimestamp(date)),
+        html.H6(str(df.shape[0]) + " rows"),
 
         dash_table.DataTable(
             df.to_dict('records'),
