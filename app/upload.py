@@ -5,6 +5,7 @@ import io
 import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, html, dash_table
+from dash.dash_table.Format import Format, Group, Scheme, Symbol
 
 import pandas as pd
 
@@ -84,8 +85,27 @@ def parse_contents(contents, filename, date):
         html.H6(str(df.shape[0]) + " rows"),
 
         dash_table.DataTable(
-            df.to_dict('records'),
-            [{'name': i, 'id': i} for i in df.columns]
+            data=df.to_dict('records'),
+            columns= #[{'name': i, 'id': i} for i in ['Date', 'Account Name', 'Type', 'Description', 'Value']],
+            [
+                dict(id='Date', name='Date'),
+                dict(id='Account Name', name='Account Name'),
+                dict(id='Type', name='Type'),
+                dict(id='Description', name='Description'),
+                dict(id='Value', name='Value', type='numeric', format=Format(
+                    scheme=Scheme.fixed, 
+                    precision=2,
+                    group=Group.yes,
+                    groups=3,
+                    group_delimiter=',',
+                    decimal_delimiter='.',
+                    symbol=Symbol.yes, 
+                    symbol_prefix=u'£')
+                     )
+            ],
+            style_cell_conditional=[
+                {"if": {"column_id": c}, "textAlign": "left"} for c in ['Description', 'Type', 'Account Name']
+            ]
         ),
 
         html.Hr(),  # horizontal line
