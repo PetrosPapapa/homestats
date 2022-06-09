@@ -60,7 +60,13 @@ def parse_csv(content):
 
     # Strip "balance" rows
     df = df[df["Type"].notna()]
+
+    # Format date
+    df["Date"] = df["Date"].dt.date # see https://community.plotly.com/t/datatable-datetime-format/31091/8
     
+    # Sort by date
+    # df = df.sort_values(by=["Date"], ascending=True)
+
     return df
 
 def parse_contents(contents, filename, date):
@@ -88,8 +94,8 @@ def parse_contents(contents, filename, date):
             data=df.to_dict('records'),
             columns= #[{'name': i, 'id': i} for i in ['Date', 'Account Name', 'Type', 'Description', 'Value']],
             [
-                dict(id='Date', name='Date'),
-                dict(id='Account Name', name='Account Name'),
+                dict(id='Date', name='Date', type='datetime'),
+                dict(id='Account Number', name='Account Number'),
                 dict(id='Type', name='Type'),
                 dict(id='Description', name='Description'),
                 dict(id='Value', name='Value', type='numeric', format=Format(
@@ -104,8 +110,10 @@ def parse_contents(contents, filename, date):
                      )
             ],
             style_cell_conditional=[
-                {"if": {"column_id": c}, "textAlign": "left"} for c in ['Description', 'Type', 'Account Name']
-            ]
+                {"if": {"column_id": c}, "textAlign": "left"} for c in ['Description', 'Type', 'Account Number']
+            ],
+            sort_action='native',
+            sort_by=[dict(column_id='Date', direction='asc')]
         ),
 
         html.Hr(),  # horizontal line
