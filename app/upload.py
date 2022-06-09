@@ -3,9 +3,10 @@ import datetime
 import io
 
 import dash
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, MATCH
 from dash import dcc, html, dash_table
 from dash.dash_table.Format import Format, Group, Scheme, Symbol
+from dash.exceptions import PreventUpdate
 
 import pandas as pd
 
@@ -74,7 +75,7 @@ def parse_csv(content):
 
     return df
 
-def parse_contents(contents, filename, date):
+def parse_contents(index, contents, filename):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
@@ -92,10 +93,18 @@ def parse_contents(contents, filename, date):
     
     return html.Div([
         html.H4(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
         html.H6(str(df.shape[0]) + " rows"),
 
+        html.Button('Select All', id={'type': 'select-all-button', 'index': index}, n_clicks=0),
+        html.Button('Deselect All', id={'type': 'deselect-all-button', 'index': index}, n_clicks=0),
+        dcc.Dropdown(
+            id={'type': "category_dropdown", 'index': index},
+            options=[{"label": st, "value": st} for st in categories],
+            placeholder="-Set the Category-",
+        ),
+
         dash_table.DataTable(
+            id={'type': 'transaction_table', 'index': index},
             data=df.to_dict('records'),
             columns= #[{'name': i, 'id': i} for i in ['Date', 'Account Name', 'Type', 'Description', 'Value']],
             [
@@ -128,6 +137,7 @@ def parse_contents(contents, filename, date):
             sort_by=[dict(column_id='Date', direction='asc')],
             hidden_columns=['Account Name', 'Balance'],
             filter_action='native',
+            row_selectable="multi",
 
             dropdown={
                 'Category': {
@@ -143,14 +153,65 @@ def parse_contents(contents, filename, date):
 
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
-              State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
-def update_output(list_of_contents, list_of_names, list_of_dates):
+              State('upload-data', 'filename'))
+def update_output(list_of_contents, list_of_names):
     if list_of_contents is not None:
         children = [
-            parse_contents(c, n, d) for c, n, d in
-            zip(list_of_contents, list_of_names, list_of_dates)]
+            parse_contents(i, c, n) for i, c, n in
+            zip(list(range(0,len(list_of_contents))), list_of_contents, list_of_names)]
         return children
+
+
+# see https://stackoverflow.com/questions/61905396/dash-datatable-with-select-all-checkbox
+# but updated for pattern-matching callback
+@app.callback(
+    [Output({'type': 'transaction_table', 'index': MATCH}, 'selected_rows')],
+    [
+        Input({'type': 'select-all-button', 'index': MATCH}, 'n_clicks'),
+        Input({'type': 'deselect-all-button', 'index': MATCH}, 'n_clicks')
+    ],
+    [
+        State({'type': 'transaction_table', 'index': MATCH}, 'data'),
+        State({'type': 'transaction_table', 'index': MATCH}, 'derived_virtual_data'),
+        State({'type': 'transaction_table', 'index': MATCH}, 'derived_virtual_selected_rows')
+    ]
+)
+def select_all(select_n_clicks, deselect_n_clicks, original_rows, filtered_rows, selected_rows):
+    ctx = [*dash.callback_context.triggered_prop_ids.values()]
+    if not ctx:
+        raise PreventUpdate
+    ctx_caller = ctx[0]['type']
+    if filtered_rows is not None:
+        if ctx_caller == 'select-all-button':
+            selected_ids = [row for row in filtered_rows]
+            return [[i for i, row in enumerate(original_rows) if row in selected_ids]]
+        if ctx_caller == 'deselect-all-button':
+            return [[]]
+        raise PreventUpdate
+    else:
+        raise PreventUpdate
+
+
+def update_category(category, selected, rowid, row):
+    if rowid in selected:
+        row.update({'Category': category})
+        return row
+    else:
+        return row
+
+@app.callback(
+    Output({'type': 'transaction_table', 'index': MATCH}, "data"), 
+    Input({'type': "category_dropdown", 'index': MATCH}, "value"),
+    State({'type': 'transaction_table', 'index': MATCH}, 'derived_virtual_selected_rows'),
+    State({'type': 'transaction_table', 'index': MATCH}, 'data')
+)
+def set_category(category, selected, original):
+    if selected is None:
+        raise PreventUpdate
+    if not category:
+        raise PreventUpdate
+    return [update_category(category, selected, i, r) for i,r in enumerate(original)]
+
 
 if __name__ == '__main__':
     app.run_server(debug=True, host=ss.host)
