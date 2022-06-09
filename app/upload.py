@@ -67,6 +67,9 @@ def parse_csv(content):
     # Sort by date
     # df = df.sort_values(by=["Date"], ascending=True)
 
+    # Add category
+    df['Category'] = "UNKNOWN"
+
     return df
 
 def parse_contents(contents, filename, date):
@@ -95,8 +98,9 @@ def parse_contents(contents, filename, date):
             columns= #[{'name': i, 'id': i} for i in ['Date', 'Account Name', 'Type', 'Description', 'Value']],
             [
                 dict(id='Date', name='Date', type='datetime'),
+                dict(id='Account Name', name='Account Name', hideable=True),
                 dict(id='Account Number', name='Account Number'),
-                dict(id='Type', name='Type'),
+                dict(id='Type', name='Type', hideable=True),
                 dict(id='Description', name='Description'),
                 dict(id='Value', name='Value', type='numeric', format=Format(
                     scheme=Scheme.fixed, 
@@ -107,13 +111,18 @@ def parse_contents(contents, filename, date):
                     decimal_delimiter='.',
                     symbol=Symbol.yes, 
                     symbol_prefix=u'£')
-                     )
+                     ),
+                dict(id='Balance', name='Balance', hideable=True),
+                dict(id='Category', name='Category', editable=True)
             ],
             style_cell_conditional=[
-                {"if": {"column_id": c}, "textAlign": "left"} for c in ['Description', 'Type', 'Account Number']
+                {"if": {"column_id": c}, "textAlign": "left"} for c in ['Description', 'Type', 'Account Name', 'Account Number']
+            ] + [
+                {"if": {"column_id": c}, "textAlign": "center"} for c in ['Category']
             ],
             sort_action='native',
-            sort_by=[dict(column_id='Date', direction='asc')]
+            sort_by=[dict(column_id='Date', direction='asc')],
+            hidden_columns=['Account Name', 'Balance']
         ),
 
         html.Hr(),  # horizontal line
