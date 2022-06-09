@@ -13,6 +13,9 @@ import appsecrets as ss
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
+expected_columns = ["Date", "Type", "Description", "Value", "Balance", "Account Name", "Account Number"]
+categories = ["UNKNOWN", "A", "B", "C"]
+
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
@@ -53,7 +56,6 @@ def parse_csv(content):
     )
 
     # Check columns are as expected
-    expected_columns = ["Date", "Type", "Description", "Value", "Balance", "Account Name", "Account Number"]
     actual_columns = list(df.columns.values)
     if (expected_columns != actual_columns):
         raise InvalidTransactionFile("Invalid columns: " + str(actual_columns) + " - need: " + str(expected_columns) )
@@ -87,7 +89,7 @@ def parse_contents(contents, filename, date):
         return html.Div([
             err
         ])
-
+    
     return html.Div([
         html.H4(filename),
         html.H6(datetime.datetime.fromtimestamp(date)),
@@ -113,18 +115,29 @@ def parse_contents(contents, filename, date):
                     symbol_prefix=u'£')
                      ),
                 dict(id='Balance', name='Balance', hideable=True),
-                dict(id='Category', name='Category', editable=True)
+                dict(id='Category', name='Category', editable=True, presentation= 'dropdown')
             ],
+
             style_cell_conditional=[
                 {"if": {"column_id": c}, "textAlign": "left"} for c in ['Description', 'Type', 'Account Name', 'Account Number']
             ] + [
                 {"if": {"column_id": c}, "textAlign": "center"} for c in ['Category']
             ],
+
             sort_action='native',
             sort_by=[dict(column_id='Date', direction='asc')],
-            hidden_columns=['Account Name', 'Balance']
-        ),
+            hidden_columns=['Account Name', 'Balance'],
+            filter_action='native',
 
+            dropdown={
+                'Category': {
+                    'options': [
+                        {'label': i, 'value': i} for i in categories
+                    ],
+                    'clearable': False
+                }
+            }
+        ),
         html.Hr(),  # horizontal line
     ])
 
