@@ -11,6 +11,7 @@ from dash.exceptions import PreventUpdate
 import pandas as pd
 
 import appsecrets as ss
+from transactions import categorize
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -149,6 +150,7 @@ def parse_contents(index, contents, filename):
             }
         ),
         html.Hr(),  # horizontal line
+        html.Div(categorize("barbar"))
     ])
 
 @app.callback(Output('output-data-upload', 'children'),
