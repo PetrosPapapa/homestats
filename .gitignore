@@ -130,3 +130,4 @@ dmypy.json
 
 app/appsecrets.py
 data/*
+app/transactions/categories.csv

@@ -16,7 +16,24 @@ from transactions import categorize
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 expected_columns = ["Date", "Type", "Description", "Value", "Balance", "Account Name", "Account Number"]
-categories = ["UNKNOWN", "A", "B", "C"]
+categories = [
+    "UNKNOWN",
+    "BILLS",
+    "CAR",
+    "CASH",
+    "INCOME",
+    "OTHER",
+    "PHONE",
+    "RENT",
+    "SCHOOL",
+    "SHOPPING",
+    "SUPERMARKET",
+    "TAX",
+    "TICKETS",
+    "TRANSFER",
+    "UNIVERSITY",
+]
+
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -72,7 +89,7 @@ def parse_csv(content):
     # df = df.sort_values(by=["Date"], ascending=True)
 
     # Add category
-    df['Category'] = "UNKNOWN"
+    df['Category'] = df.apply (lambda row: categorize(row['Description']), axis=1)
 
     return df
 
@@ -150,7 +167,6 @@ def parse_contents(index, contents, filename):
             }
         ),
         html.Hr(),  # horizontal line
-        html.Div(categorize("barbar"))
     ])
 
 @app.callback(Output('output-data-upload', 'children'),

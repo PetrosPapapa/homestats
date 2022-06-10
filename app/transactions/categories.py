@@ -3,7 +3,7 @@ import re
 import csv
 
 reader = csv.reader(open('app/transactions/categories.csv','r'), delimiter=',', quotechar="\"")
-reader_rows = [(row[0], row[1]) for row in reader]
+reader_rows = [(row[0], row[1]) for row in reader if len(row)==2]
 
 def categorize_from_rows(item, rows):
     for (cat, regex) in rows:
