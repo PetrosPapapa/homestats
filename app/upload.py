@@ -142,7 +142,7 @@ def parse_contents(index, contents, filename):
                     symbol_prefix=u'£')
                      ),
                 dict(id='Balance', name='Balance', hideable=True),
-                dict(id='Category', name='Category', editable=True, presentation= 'dropdown')
+                dict(id='Category', name='Category', editable=True) #, presentation= 'dropdown')
             ],
 
             style_cell_conditional=[
@@ -156,15 +156,16 @@ def parse_contents(index, contents, filename):
             hidden_columns=['Account Name', 'Balance'],
             filter_action='native',
             row_selectable="multi",
+            cell_selectable=False,
 
-            dropdown={
-                'Category': {
-                    'options': [
-                        {'label': i, 'value': i} for i in categories
-                    ],
-                    'clearable': False
-                }
-            }
+#            dropdown={
+#                'Category': {
+#                    'options': [
+#                        {'label': i, 'value': i} for i in categories
+#                    ],
+#                    'clearable': False
+#                }
+#            }
         ),
         html.Hr(),  # horizontal line
     ])
@@ -220,7 +221,7 @@ def update_category(category, selected, rowid, row):
 @app.callback(
     Output({'type': 'transaction_table', 'index': MATCH}, "data"), 
     Input({'type': "category_dropdown", 'index': MATCH}, "value"),
-    State({'type': 'transaction_table', 'index': MATCH}, 'derived_virtual_selected_rows'),
+    State({'type': 'transaction_table', 'index': MATCH}, 'selected_rows'),
     State({'type': 'transaction_table', 'index': MATCH}, 'data')
 )
 def set_category(category, selected, original):
