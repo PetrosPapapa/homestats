@@ -71,6 +71,7 @@ def parse_csv(content):
         dayfirst=True,
         index_col=False,
         na_values=[''],
+        escapechar="\'",
         skipinitialspace=True
     )
 
@@ -81,6 +82,10 @@ def parse_csv(content):
 
     # Strip "balance" rows
     df = df[df["Type"].notna()]
+    df = df[df["Type"] != "STATEMENT"]
+
+    # Inverse credit card values
+    df.loc[df['Account Number'].str.startswith("5434"), 'Value'] = -df['Value']
 
     # Format date
     df["Date"] = df["Date"].dt.date # see https://community.plotly.com/t/datatable-datetime-format/31091/8
@@ -90,6 +95,9 @@ def parse_csv(content):
 
     # Add category
     df['Category'] = df.apply (lambda row: categorize(row['Description']), axis=1)
+
+    # Unknown positives are income
+    df.loc[(df['Category']=="UNKNOWN") & (df['Value']>0), 'Category'] = "INCOME"
 
     return df
 
@@ -156,7 +164,7 @@ def parse_contents(index, contents, filename):
             hidden_columns=['Account Name', 'Balance'],
             filter_action='native',
             row_selectable="multi",
-            cell_selectable=False,
+            # cell_selectable=False, # we can't even c/p if this is false
 
 #            dropdown={
 #                'Category': {
