@@ -12,27 +12,12 @@ import pandas as pd
 
 import appsecrets as ss
 from transactions import categorize
+from transactions.db import MockTransactionDB
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 expected_columns = ["Date", "Type", "Description", "Value", "Balance", "Account Name", "Account Number"]
-categories = [
-    "UNKNOWN",
-    "BILLS",
-    "CAR",
-    "CASH",
-    "INCOME",
-    "OTHER",
-    "PHONE",
-    "RENT",
-    "SCHOOL",
-    "SHOPPING",
-    "SUPERMARKET",
-    "TAX",
-    "TICKETS",
-    "TRANSFER",
-    "UNIVERSITY",
-]
+categories = MockTransactionDB().getCategories()
 
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
