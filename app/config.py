@@ -1,4 +1,8 @@
 from transactions.db import MockTransactionDB, MySQLTransactionDB
+import dash
 
-db=MySQLTransactionDB() # MockTransactionDB()
+#db=MySQLTransactionDB() 
+db=MockTransactionDB()
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 

@@ -10,12 +10,9 @@ from transactions import categorize
 from transactions.db import TransactionDB
 from transactions.parser import parse_file
 
-from config import db
+from config import db, app
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-app.layout = html.Div([
+layout = html.Div([
     dcc.Upload(
         id='upload-data',
         children=html.Div([
