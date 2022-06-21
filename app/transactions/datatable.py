@@ -1,6 +1,5 @@
 import datetime
 
-import dash
 from dash.dependencies import Input, Output, State, MATCH
 from dash import dcc, html, dash_table
 from dash.dash_table.Format import Format, Group, Scheme, Symbol
