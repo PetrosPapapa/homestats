@@ -7,12 +7,6 @@ import appsecrets as ss
 
 class TransactionDB():
     def getCategories(self):
-        raise NotImplementedError
-    def insertTransactions(self, df):
-        raise NotImplementedError
-
-class MockTransactionDB(TransactionDB):
-    def getCategories(self):
         return [
             "UNKNOWN",
             "BILLS",
@@ -32,6 +26,10 @@ class MockTransactionDB(TransactionDB):
         ]
 
     def insertTransactions(self, df):
+        raise NotImplementedError
+
+class MockTransactionDB(TransactionDB):
+    def insertTransactions(self, df):
         print(df)
 
 class MySQLTransactionDB(TransactionDB):
@@ -40,7 +38,7 @@ class MySQLTransactionDB(TransactionDB):
         self.Base=declarative_base(self.engine)
         class Transaction(self.Base):
             """"""
-            __tablename__ = ss.db.transactions_tbl
+            __tablename__ = ss.db["transactions_tbl"]
             __table_args__ = {'autoload': True}
         self.Transaction=Transaction
 
@@ -52,13 +50,13 @@ class MySQLTransactionDB(TransactionDB):
         return session
 
 
-    def getCategories(self):
-        categories = []
-        for cat in self.loadSession().query(self.Transaction.Category).distinct():
-            categories.append(cat.Category)
-        return categories
+#    def getCategories(self):
+#        categories = []
+#        for cat in self.loadSession().query(self.Transaction.Category).distinct():
+#            categories.append(cat.Category)
+#        return categories
 
     def insertTransactions(self, df):
         dfi = df.reset_index()
         dfi = dfi.drop('index', 1)
-        return dfi.to_sql(ss.db.transactions_tbl, engine, if_exists='append')
+        return dfi.to_sql(ss.db["transactions_tbl"], self.engine, if_exists='append', index=False)
