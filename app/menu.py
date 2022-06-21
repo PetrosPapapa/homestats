@@ -1,6 +1,6 @@
 from dash import html
 
-layout = html.Div([
+layout = html.Nav([
     html.Ul([
         html.Li("Menu 1"),
         html.Li("Menu 2"),
