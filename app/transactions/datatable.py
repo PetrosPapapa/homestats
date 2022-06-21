@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import dash
 from dash.dependencies import Input, Output, State, MATCH
@@ -12,8 +13,9 @@ from transactions.parser import parse_file
 
 from config import db
 
+assets_path = os.getcwd() +'/app/assets'
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_folder=assets_path)
 
 app.layout = html.Div([
     dcc.Upload(
