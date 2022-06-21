@@ -1,36 +1,41 @@
 import datetime
 
+import dash
 from dash.dependencies import Input, Output, State, MATCH
 from dash import dcc, html, dash_table
 from dash.dash_table.Format import Format, Group, Scheme, Symbol
 from dash.exceptions import PreventUpdate
 
+import pandas as pd
+
 from transactions import categorize
 from transactions.db import TransactionDB
 from transactions.parser import parse_file
 
-from config import db, app
+from config import db, app, log
 
 layout = html.Div([
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        # Allow multiple files to be uploaded
-        multiple=True
-    ),
+    html.Div(
+        dcc.Upload(
+            id='upload-data',
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select Files')
+            ]),
+            style={
+                'width': '100%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            },
+            # Allow multiple files to be uploaded
+            multiple=True
+        ),
+        id='upload-data-container'),
     html.Div(id='output-data-upload'),
 ])
     
@@ -46,6 +51,7 @@ def parse_contents(index, contents, filename):
         ])
     
     categories = db.getCategories()
+    unknowns = len(df[df['Category']=='UNKNOWN'])
         
     return html.Div([
         html.H4(filename),
@@ -106,17 +112,23 @@ def parse_contents(index, contents, filename):
             #            }
         ),
         html.Hr(),  # horizontal line
-    ])
+        html.Button('SUBMIT', id={'type': 'transactions_submit', 'index': index}, n_clicks=0, disabled=(unknowns > 0)),
+        html.Div('Unknowns remaining: {}'.format(unknowns), id={'type': 'unknown-counter', 'index': index}),
+    ], id={'type': 'transaction_table_container', 'index': index})
 
-@app.callback(Output('output-data-upload', 'children'),
-              Input('upload-data', 'contents'),
-              State('upload-data', 'filename'))
+@app.callback(
+    Output('output-data-upload', 'children'),
+    Output('upload-data-container', 'children'),
+    Input('upload-data', 'contents'),
+    State('upload-data', 'filename'), 
+    prevent_initial_call=True
+)
 def update_output(list_of_contents, list_of_names):
     if list_of_contents is not None:
         children = [
             parse_contents(i, c, n) for i, c, n in
             zip(list(range(0,len(list_of_contents))), list_of_contents, list_of_names)]
-        return children
+        return children, ""
     
     
 # see https://stackoverflow.com/questions/61905396/dash-datatable-with-select-all-checkbox
@@ -169,3 +181,24 @@ def set_category(category, selected, original):
         raise PreventUpdate
     return [update_category(category, selected, i, r) for i,r in enumerate(original)]
 
+@app.callback(
+    Output({'type': 'transactions_submit', 'index': MATCH}, "disabled"), 
+    Output({'type': 'unknown-counter', 'index': MATCH}, "children"), 
+    Input({'type': 'transaction_table', 'index': MATCH}, "data"), 
+)
+def enable_submit(data):
+    count=[d['Category'] for d in data].count('UNKNOWN')
+    if count > 0:
+        return True, 'Unknowns remaining: {}'.format(count);
+    else:
+        return False, "";
+
+@app.callback(
+    Output({'type': 'transaction_table_container', 'index': MATCH}, 'children'),
+    Input({'type': 'transactions_submit', 'index': MATCH}, "n_clicks"), 
+    State({'type': 'transaction_table', 'index': MATCH}, 'data'),
+    prevent_initial_call=True,
+)
+def enable_submit(clicks, data):
+    db.insertTransactions(pd.DataFrame(data))
+    return 'Transactions submitted.'

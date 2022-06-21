@@ -1,4 +1,5 @@
 import os
+import logging
 
 from transactions.db import MockTransactionDB, MySQLTransactionDB
 import dash
@@ -10,3 +11,5 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_fold
 #db=MySQLTransactionDB() 
 db=MockTransactionDB()
 
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)

@@ -8,6 +8,8 @@ import appsecrets as ss
 class TransactionDB():
     def getCategories(self):
         raise NotImplementedError
+    def insertTransactions(self, df):
+        raise NotImplementedError
 
 class MockTransactionDB(TransactionDB):
     def getCategories(self):
@@ -29,13 +31,16 @@ class MockTransactionDB(TransactionDB):
             "UNIVERSITY",
         ]
 
+    def insertTransactions(self, df):
+        print(df)
+
 class MySQLTransactionDB(TransactionDB):
     def __init__(self):
         self.engine = create_engine(f'mysql+pymysql://{ss.db["username"]}:{ss.db["password"]}@{ss.db["host"]}:{ss.db["port"]}/{ss.db["database"]}', pool_recycle=3600) #, echo=True)
         self.Base=declarative_base(self.engine)
         class Transaction(self.Base):
             """"""
-            __tablename__ = 'transactions'
+            __tablename__ = ss.db.transactions_tbl
             __table_args__ = {'autoload': True}
         self.Transaction=Transaction
 
@@ -53,3 +58,7 @@ class MySQLTransactionDB(TransactionDB):
             categories.append(cat.Category)
         return categories
 
+    def insertTransactions(self, df):
+        dfi = df.reset_index()
+        dfi = dfi.drop('index', 1)
+        return dfi.to_sql(ss.db.transactions_tbl, engine, if_exists='append')
