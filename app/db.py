@@ -1,3 +1,5 @@
+import datetime
+
 import pandas as pd
 
 from sqlalchemy import create_engine
@@ -35,8 +37,16 @@ class AppDB():
 class MockDB(AppDB):
     def insertTransactions(self, df):
         print(df)
+
     def getEnergyData(self):
-        raise NotImplementedError
+        l=60
+        data = {
+            "address": [ss.energy["address"]] * l, 
+            "date": pd.date_range(datetime.datetime.today(), periods=l, freq="M").tolist(),
+            "electricity": [x * l * x for x in range(l)],
+            "gas": [x * l * (x+5) for x in range(l)] 
+        }
+        return pd.DataFrame(data)
 
 class MySQL(AppDB):
     def __init__(self):
