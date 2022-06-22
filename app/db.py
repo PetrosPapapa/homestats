@@ -1,3 +1,5 @@
+import pandas as pd
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -5,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 import appsecrets as ss
 
 
-class TransactionDB():
+class AppDB():
     def getCategories(self):
         return [
             "UNKNOWN",
@@ -27,20 +29,32 @@ class TransactionDB():
 
     def insertTransactions(self, df):
         raise NotImplementedError
+    def getEnergyData(self):
+        raise NotImplementedError
 
-class MockTransactionDB(TransactionDB):
+class MockDB(AppDB):
     def insertTransactions(self, df):
         print(df)
+    def getEnergyData(self):
+        raise NotImplementedError
 
-class MySQLTransactionDB(TransactionDB):
+class MySQL(AppDB):
     def __init__(self):
         self.engine = create_engine(f'mysql+pymysql://{ss.db["username"]}:{ss.db["password"]}@{ss.db["host"]}:{ss.db["port"]}/{ss.db["database"]}', pool_recycle=3600) #, echo=True)
+
         self.Base=declarative_base(self.engine)
         class Transaction(self.Base):
             """"""
             __tablename__ = ss.db["transactions_tbl"]
             __table_args__ = {'autoload': True}
         self.Transaction=Transaction
+
+        class Energy(self.Base):
+            """"""
+            __tablename__ = ss.db["energy_tbl"]
+            __table_args__ = {'autoload': True}
+        self.Energy=Energy
+
 
     def loadSession(self):
         """"""
@@ -60,3 +74,9 @@ class MySQLTransactionDB(TransactionDB):
         dfi = df.reset_index()
         dfi = dfi.drop('index', 1)
         return dfi.to_sql(ss.db["transactions_tbl"], self.engine, if_exists='append', index=False)
+
+    def getEnergyData(self):
+        session = self.loadSession()
+        qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.asc())
+        readings = pd.read_sql(qry.statement, self.engine)
+        return readings;

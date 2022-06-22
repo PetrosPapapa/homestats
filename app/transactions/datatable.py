@@ -9,7 +9,6 @@ from dash.exceptions import PreventUpdate
 import pandas as pd
 
 from transactions import categorize
-from transactions.db import TransactionDB
 from transactions.parser import parse_file
 
 from config import db, app, log
