@@ -103,3 +103,8 @@ class MySQL(AppDB):
         qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.asc())
         readings = pd.read_sql(qry.statement, self.engine)
         return readings;
+
+    def lastEnergyEntry(self):
+        session = self.loadSession()
+        qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.desc()).first()
+        return vars(qry);
