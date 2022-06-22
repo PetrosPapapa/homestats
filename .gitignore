@@ -128,4 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-appsecrets.py
+app/appsecrets.py
+data/*
+app/transactions/categories.csv
