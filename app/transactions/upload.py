@@ -2,7 +2,7 @@ import datetime
 
 import dash
 from dash.dependencies import Input, Output, State, MATCH
-from dash import dcc, html, dash_table
+from dash import dcc, callback, html, dash_table
 from dash.dash_table.Format import Format, Group, Scheme, Symbol
 from dash.exceptions import PreventUpdate
 
@@ -11,7 +11,7 @@ import pandas as pd
 from transactions import categorize
 from transactions.parser import parse_file
 
-from config import db, app, log
+from config import db, log
 
 layout = html.Div([
     html.Div(
@@ -23,8 +23,8 @@ layout = html.Div([
             ]),
             style={
                 'width': '100%',
-                'height': '60px',
-                'lineHeight': '60px',
+                'height': '70px',
+                'lineHeight': '70px',
                 'borderWidth': '1px',
                 'borderStyle': 'dashed',
                 'borderRadius': '5px',
@@ -115,7 +115,7 @@ def parse_contents(index, contents, filename):
         html.Div('Unknowns remaining: {}'.format(unknowns), id={'type': 'unknown-counter', 'index': index}),
     ], id={'type': 'transaction_table_container', 'index': index})
 
-@app.callback(
+@callback(
     Output('output-data-upload', 'children'),
     Output('upload-data-container', 'children'),
     Input('upload-data', 'contents'),
@@ -132,7 +132,7 @@ def update_output(list_of_contents, list_of_names):
     
 # see https://stackoverflow.com/questions/61905396/dash-datatable-with-select-all-checkbox
 # but updated for pattern-matching callback
-@app.callback(
+@callback(
     [Output({'type': 'transaction_table', 'index': MATCH}, 'selected_rows')],
     [
         Input({'type': 'select-all-button', 'index': MATCH}, 'n_clicks'),
@@ -167,7 +167,7 @@ def update_category(category, selected, rowid, row):
     else:
         return row
     
-@app.callback(
+@callback(
     Output({'type': 'transaction_table', 'index': MATCH}, "data"), 
     Input({'type': "category_dropdown", 'index': MATCH}, "value"),
     State({'type': 'transaction_table', 'index': MATCH}, 'selected_rows'),
@@ -180,7 +180,7 @@ def set_category(category, selected, original):
         raise PreventUpdate
     return [update_category(category, selected, i, r) for i,r in enumerate(original)]
 
-@app.callback(
+@callback(
     Output({'type': 'transactions_submit', 'index': MATCH}, "disabled"), 
     Output({'type': 'unknown-counter', 'index': MATCH}, "children"), 
     Input({'type': 'transaction_table', 'index': MATCH}, "data"), 
@@ -192,7 +192,7 @@ def enable_submit(data):
     else:
         return False, "";
 
-@app.callback(
+@callback(
     Output({'type': 'transaction_table_container', 'index': MATCH}, 'children'),
     Input({'type': 'transactions_submit', 'index': MATCH}, "n_clicks"), 
     State({'type': 'transaction_table', 'index': MATCH}, 'data'),

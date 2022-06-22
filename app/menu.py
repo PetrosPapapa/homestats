@@ -1,10 +1,14 @@
-from dash import html
+import dash
+from dash import html, dcc
 
 layout = html.Nav([
     html.Ul([
-        html.Li("Menu 1"),
-        html.Li("Menu 2"),
-        html.Li("Menu 3"),
-        html.Li("Menu 4"),
+        dcc.Link(
+            html.Li(
+                f"{page['name']}" # - {page['path']}"
+            ), href=page["relative_path"]
+        )
+        for page in dash.page_registry.values()
     ])
 ])
+    
