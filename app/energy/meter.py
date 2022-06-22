@@ -1,14 +1,14 @@
 from datetime import date, timedelta
 
+from config import db
+
 import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, callback, html
 from dash.exceptions import PreventUpdate
 
 def fields():
-    lastElectricity = 12345
-    lastGas = 4321
-    lastDate = date.today() - timedelta(days=96)
+    last = db.lastEnergyEntry()
 
     return [
         html.Label("Date", htmlFor="meter-date"),
@@ -16,7 +16,7 @@ def fields():
             id='meter-date',
             max_date_allowed=date.today(),
             #initial_visible_month=date(2017, 8, 5),
-            date=lastDate,
+            date=last["date"],
             display_format='YYYY-MM-DD',
         ),
       
@@ -24,9 +24,9 @@ def fields():
         dcc.Input(
             id="meter-electricity",
             type="number",
-            placeholder=lastElectricity,
+            placeholder=last["electricity"],
             # debounce=True,
-            min=lastElectricity,
+            min=last["electricity"],
             required=True,
             inputMode='numeric',
         ),
@@ -35,9 +35,9 @@ def fields():
         dcc.Input(
             id="meter-gas",
             type="number",
-            placeholder=lastGas,
+            placeholder=last["gas"],
             # debounce=True,
-            min=lastGas,
+            min=last["gas"],
             required=True,
             inputMode='numeric',
         ),

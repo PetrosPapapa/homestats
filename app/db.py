@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 
@@ -33,20 +33,33 @@ class AppDB():
         raise NotImplementedError
     def getEnergyData(self):
         raise NotImplementedError
+    def lastEnergyEntry(self):
+        raise NotImplementedError
+
 
 class MockDB(AppDB):
+
+    def __init__(self):
+        self.mock_months=60
+        l = self.mock_months
+        d = {
+            "address": [ss.energy["address"]] * l, 
+            "date": pd.date_range(datetime.today() - timedelta(days=(l+1) * 30), periods=l, freq="M").tolist(),
+            "electricity": [x * l * x for x in range(l)],
+            "gas": [x * l * (x+5) for x in range(l)] 
+        }
+        self.data = pd.DataFrame(d)
+        print(self.data)
+    
     def insertTransactions(self, df):
         print(df)
 
     def getEnergyData(self):
-        l=60
-        data = {
-            "address": [ss.energy["address"]] * l, 
-            "date": pd.date_range(datetime.datetime.today(), periods=l, freq="M").tolist(),
-            "electricity": [x * l * x for x in range(l)],
-            "gas": [x * l * (x+5) for x in range(l)] 
-        }
-        return pd.DataFrame(data)
+        return self.data
+
+    def lastEnergyEntry(self):
+        return self.data.iloc[-1].to_dict()
+
 
 class MySQL(AppDB):
     def __init__(self):
