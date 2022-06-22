@@ -6,8 +6,8 @@ import config
 import dash
 from dash import html, dcc
 
-from energy import viz
-from transactions.upload import layout as upload_layout
+from energy import viz, meter
+from transactions import upload
 
 if __name__ == '__main__':
     app = dash.Dash(__name__, 
@@ -34,7 +34,9 @@ if __name__ == '__main__':
             )
         ])
     elif args[1] == "upload":
-        app.layout=upload_layout
+        app.layout=upload.layout
+    elif args[1] == "meter":
+        app.layout=meter.form
     else:
         app.layout=html.Div("Unknown parameter")
 
