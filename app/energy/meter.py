@@ -11,37 +11,43 @@ def fields():
     last = db.lastEnergyEntry()
 
     return [
-        html.Label("Date", htmlFor="meter-date"),
-        dcc.DatePickerSingle(
-            id='meter-date',
-            max_date_allowed=date.today(),
-            #initial_visible_month=date(2017, 8, 5),
-            date=last["date"],
-            display_format='YYYY-MM-DD',
-        ),
+        html.Div([
+            html.Label("Electricity", htmlFor="meter-electricity"),
+            dcc.Input(
+                id="meter-electricity",
+                type="number",
+                placeholder=last["electricity"],
+                # debounce=True,
+                min=last["electricity"],
+                required=True,
+                inputMode='numeric',
+            ),
+        ]),
+
+        html.Div([
+            html.Label("Gas", htmlFor="meter-gas"),
+            dcc.Input(
+                id="meter-gas",
+                type="number",
+                placeholder=last["gas"],
+                # debounce=True,
+                min=last["gas"],
+                required=True,
+                inputMode='numeric',
+            ),
+        ]),
+
+        html.Div([
+            html.Label("Date", htmlFor="meter-date"),
+            dcc.DatePickerSingle(
+                id='meter-date',
+                max_date_allowed=date.today(),
+                #initial_visible_month=date(2017, 8, 5),
+                date=last["date"],
+                display_format='YYYY-MM-DD',
+            ),
+        ]),
       
-        html.Label("Electricity", htmlFor="meter-electricity"),
-        dcc.Input(
-            id="meter-electricity",
-            type="number",
-            placeholder=last["electricity"],
-            # debounce=True,
-            min=last["electricity"],
-            required=True,
-            inputMode='numeric',
-        ),
-
-        html.Label("Gas", htmlFor="meter-gas"),
-        dcc.Input(
-            id="meter-gas",
-            type="number",
-            placeholder=last["gas"],
-            # debounce=True,
-            min=last["gas"],
-            required=True,
-            inputMode='numeric',
-        ),
-
         html.Button(
             "Submit",
             id="meter-submit",
@@ -54,6 +60,7 @@ def form():
         html.Form(
             fields(),
             id='meter-form',
+            className='meter-form', 
             action="javascript:void(0);"
         ),
         html.Div("HAA!", id="meter-output")
