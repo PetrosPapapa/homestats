@@ -64,7 +64,7 @@ def form():
             className='meter-form', 
             action="javascript:void(0);"
         ),
-        html.Div("HAA!", id="meter-output")
+        html.Div("", id="meter-output", className='meter-output')
     ])
 
 @callback(
@@ -84,7 +84,7 @@ def update_output(n_clicks, date, electricity, gas):
             'electricity': electricity, 
             'gas': gas
         })
-        return 'Date {} Electricity {} Gas {}'.format(
+        return '[{}] - Electricity: {} - Gas: {}'.format(
             date,
             electricity,
             gas

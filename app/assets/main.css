@@ -32,3 +32,9 @@ button[disabled]{
     width: 100%;
 }
 
+.meter-output {
+    margin-top: 10px;
+    padding: 3px;
+    color: #555555;
+    font-size: 8pt;
+}
