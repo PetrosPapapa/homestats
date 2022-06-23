@@ -5,7 +5,7 @@ sys.path.append(__location__)
 
 from db import MockDB, MySQL
 
-assets_path = os.getcwd() + '/app/assets'
+assets_path = os.path.join(__location__, 'assets')
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 db=MySQL() 
