@@ -78,7 +78,7 @@ class MockDB(AppDB):
         if category == "UNKNOWN" or category == "TRANSFER":
             return 0;
         elif category == "INCOME":
-            return 1500;
+            return 6000;
         else:
             return random.randrange(-1000, -10)
 

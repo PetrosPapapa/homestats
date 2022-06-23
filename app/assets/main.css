@@ -43,3 +43,8 @@ button[disabled]{
     width: 33vw;
     height: 30em;
 }
+
+.month_bars {
+    height: 80vh;
+    min-height: 500px;
+}

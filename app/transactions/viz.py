@@ -5,8 +5,7 @@ def category_pie(transactions):
     df = data.expensesByCategory(transactions)
     return px.pie(df, 
                   values='Value', 
-                  names='Category', 
-                  title='Expenses by category'
+                  names='Category'
                   )
 
 def month_bars(transByMonth):
@@ -16,9 +15,6 @@ def month_bars(transByMonth):
                   x="Date", 
                   color='Category', 
                   orientation='v',
-#                  hover_data=["tip", "size"],
-                  height=1000,
-                  title='Expenses by month',
                   text='Value',
                   )
     fig.update_layout(
@@ -65,7 +61,6 @@ def month_balance_graph(transByMonth):
     fig = px.line(df, 
                   x="Date", 
                   y=["Value", "Smooth"], 
-                  title='Balance per month',
                   color_discrete_map={"Smooth": 'green'},
                   height=700,
                   )
@@ -125,7 +120,6 @@ def month_cumulative_graph(transByMonth):
     fig = px.line(df, 
                   x="Date", 
                   y=["Value", "Smooth"], 
-                  title='Cumulative balance per month',
                   color_discrete_map={"Smooth": 'green'},
                   height=700,
                   )
