@@ -7,7 +7,7 @@ import dash
 from dash import html, dcc
 
 from energy import meter, viz as eviz
-from transactions import upload, viz as tviz
+from transactions import upload, data as tdata, viz as tviz
 
 if __name__ == '__main__':
     app = dash.Dash(__name__, 
@@ -39,12 +39,18 @@ if __name__ == '__main__':
         app.layout=meter.form
     elif args[1] == "transactions":
         transactions=config.db.getTransactions()
+        transactionsByMonth=tdata.transactionsByMonth(transactions)
         app.layout=html.Div(children=[
             html.H1(children='Transactions'),
             
             dcc.Graph(
                 id='category_pie',
                 figure=tviz.category_pie(transactions)
+            ),
+
+            dcc.Graph(
+                id='month_bars',
+                figure=tviz.month_bars(transactionsByMonth)
             ),
             
         ])

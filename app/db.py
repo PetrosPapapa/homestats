@@ -153,7 +153,7 @@ class MySQL(AppDB):
     def getTransactions(self):
         session = self.loadSession()
         qry = session.query(self.Transaction)
-        trans = pd.read_sql(qry.statement, self.engine)
+        trans = pd.read_sql(qry.statement, con=self.engine, parse_dates=['Date'])
         log.debug(trans.head())
         log.debug(trans.tail())
         return trans;
@@ -166,7 +166,7 @@ class MySQL(AppDB):
     def getEnergyData(self):
         session = self.loadSession()
         qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.asc())
-        readings = pd.read_sql(qry.statement, self.engine)
+        readings = pd.read_sql(qry.statement, con=self.engine, parse_dates=['date'])
         return readings;
 
     def lastEnergyEntry(self):
