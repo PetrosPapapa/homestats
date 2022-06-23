@@ -6,8 +6,8 @@ import config
 import dash
 from dash import html, dcc
 
-from energy import viz, meter
-from transactions import upload
+from energy import meter, viz as eviz
+from transactions import upload, viz as tviz
 
 if __name__ == '__main__':
     app = dash.Dash(__name__, 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     args=sys.argv
     if len(args) < 2 or args[1] == "energy":
-        (efig, gfig) = viz.consumption_graphs()
+        (efig, gfig) = eviz.consumption_graphs()
 
         app.layout=html.Div(children=[
             html.H1(children='Energy Consumption'),
@@ -37,6 +37,17 @@ if __name__ == '__main__':
         app.layout=upload.layout
     elif args[1] == "meter":
         app.layout=meter.form
+    elif args[1] == "transactions":
+        transactions=config.db.getTransactions()
+        app.layout=html.Div(children=[
+            html.H1(children='Transactions'),
+            
+            dcc.Graph(
+                id='category_pie',
+                figure=tviz.category_pie(transactions)
+            ),
+            
+        ])
     else:
         app.layout=html.Div("Unknown parameter")
 

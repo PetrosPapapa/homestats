@@ -30,6 +30,13 @@ class AppDB():
             "UNIVERSITY",
         ]
 
+    def getNonExpenseCategories(self):
+        return [
+            'INCOME', 
+            'TRANSFER', 
+            'UNIVERSITY'
+        ]
+        
     def getTransactions(self):
         raise NotImplementedError
     def insertTransactions(self, df):
@@ -147,6 +154,8 @@ class MySQL(AppDB):
         session = self.loadSession()
         qry = session.query(self.Transaction)
         trans = pd.read_sql(qry.statement, self.engine)
+        log.debug(trans.head())
+        log.debug(trans.tail())
         return trans;
 
     def insertTransactions(self, df):
