@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from config import db
+import appsecrets as ss
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -77,6 +78,12 @@ def form():
 )
 def update_output(n_clicks, date, electricity, gas):
     if electricity is not None and gas is not None:
+        db.addEnergyEntry({
+            'address': ss.energy["address"], 
+            'date': date, 
+            'electricity': electricity, 
+            'gas': gas
+        })
         return 'Date {} Electricity {} Gas {}'.format(
             date,
             electricity,

@@ -35,6 +35,8 @@ class AppDB():
         raise NotImplementedError
     def lastEnergyEntry(self):
         raise NotImplementedError
+    def addEnergyEntry(self, entry):
+        raise NotImplementedError
 
 
 class MockDB(AppDB):
@@ -59,6 +61,12 @@ class MockDB(AppDB):
 
     def lastEnergyEntry(self):
         return self.data.iloc[-1].to_dict()
+
+    def addEnergyEntry(self, entry):
+        self.data = pd.concat(
+            [self.data, pd.DataFrame.from_dict([entry])], 
+            ignore_index=True
+        )
 
 
 class MySQL(AppDB):
@@ -108,3 +116,9 @@ class MySQL(AppDB):
         session = self.loadSession()
         qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.desc()).first()
         return vars(qry);
+
+    def addEnergyEntry(self, entry):
+        eentry = self.Energy(**entry)
+        session = self.loadSession()
+        session.add(eentry)
+        session.commit()
