@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import pandas as pd
 
@@ -46,7 +46,7 @@ class MockDB(AppDB):
         l = self.mock_months
         d = {
             "address": [ss.energy["address"]] * l, 
-            "date": pd.date_range(datetime.today() - timedelta(days=(l+1) * 30), periods=l, freq="M").tolist(),
+            "date": pd.date_range(date.today() - timedelta(days=(l+1) * 30), periods=l, freq="M").tolist(),
             "electricity": [x * l * x for x in range(l)],
             "gas": [x * l * (x+5) for x in range(l)] 
         }
@@ -63,10 +63,13 @@ class MockDB(AppDB):
         return self.data.iloc[-1].to_dict()
 
     def addEnergyEntry(self, entry):
+        print(entry)
         self.data = pd.concat(
             [self.data, pd.DataFrame.from_dict([entry])], 
             ignore_index=True
         )
+        print("NEW")
+        print(self.data)
 
 
 class MySQL(AppDB):

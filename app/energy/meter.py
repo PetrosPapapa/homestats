@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime as dt
 
 from config import db
 import appsecrets as ss
@@ -76,16 +76,17 @@ def form():
     State('meter-gas', 'value'),
     prevent_initial_call=True,
 )
-def update_output(n_clicks, date, electricity, gas):
+def update_output(n_clicks, date_value, electricity, gas):
     if electricity is not None and gas is not None:
+        date_obj = dt.fromisoformat(date_value)
         db.addEnergyEntry({
             'address': ss.energy["address"], 
-            'date': date, 
+            'date': date_obj,
             'electricity': electricity, 
             'gas': gas
         })
         return '[{}] - Electricity: {} - Gas: {}'.format(
-            date,
+            date_obj,
             electricity,
             gas
         ), fields()
