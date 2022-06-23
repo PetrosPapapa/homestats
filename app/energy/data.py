@@ -29,11 +29,11 @@ def energiesPerMonth():
     
     perday = pd.DataFrame(columns=columns, data=data)
 
-    epermonth = perday.drop('gas', 1)
+    epermonth = perday.drop('gas', axis=1)
     epermonth = epermonth.groupby(['month', 'year']).sum()
     epermonth = epermonth.reset_index().pivot('month', 'year', 'electricity')
 
-    gpermonth = perday.drop('electricity', 1)
+    gpermonth = perday.drop('electricity', axis=1)
     gpermonth = gpermonth.groupby(['month', 'year']).sum()
     gpermonth = gpermonth.reset_index().pivot('month', 'year', 'gas')
 
