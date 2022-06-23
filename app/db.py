@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import random
 
 import pandas as pd
 
@@ -7,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 import appsecrets as ss
-
+from log import log
 
 class AppDB():
     def getCategories(self):
@@ -29,6 +30,8 @@ class AppDB():
             "UNIVERSITY",
         ]
 
+    def getTransactions(self):
+        raise NotImplementedError
     def insertTransactions(self, df):
         raise NotImplementedError
     def getEnergyData(self):
@@ -44,32 +47,69 @@ class MockDB(AppDB):
     def __init__(self):
         self.mock_months=60
         l = self.mock_months
-        d = {
+
+        self.seed=1234
+        random.seed(self.seed)
+
+        ed = {
             "address": [ss.energy["address"]] * l, 
             "date": pd.date_range(date.today() - timedelta(days=(l+1) * 30), periods=l, freq="M").tolist(),
             "electricity": [x * l * x for x in range(l)],
             "gas": [x * l * (x+5) for x in range(l)] 
         }
-        self.data = pd.DataFrame(d)
-        print(self.data)
+
+        self.edata = pd.DataFrame(ed)
+        log.debug(self.edata.head())
+        log.debug(self.edata.tail())
+
+        td = [self.randomTransaction(i) for i in range(self.mock_months * 24 * 30)]
+        self.tdata = pd.DataFrame(td)
+        log.debug(self.tdata.head())
+        log.debug(self.tdata.tail())
+
+    def randomTValue(self, category):
+        if category == "UNKNOWN" or category == "TRANSFER":
+            return 0;
+        elif category == "INCOME":
+            return 1500;
+        else:
+            return random.randrange(-1000, -10)
+
+    def randomTransaction(self, i):
+        categories = [c for c in self.getCategories() if c != "UNKNOWN" and c != "TRANSFER"]
+        cat = categories[random.randrange(0,len(categories))]
+        return {
+            "id": i,
+            "Date": (
+                datetime.today() - timedelta(hours=self.mock_months * 24 * 30 - i)
+            ).date(),
+            "Description": "{}:{}".format(i, cat),
+            "Value": self.randomTValue(cat),
+            "Balance": 0,
+            "Account Name": "someAccount",
+            "Account Number": "101010-00001234",
+            "Category": cat
+        }
+
+    def getTransactions(self):
+        return self.tdata
     
     def insertTransactions(self, df):
-        print(df)
+        log.debug(df)
 
     def getEnergyData(self):
-        return self.data
+        return self.edata
 
     def lastEnergyEntry(self):
-        return self.data.iloc[-1].to_dict()
+        return self.edata.iloc[-1].to_dict()
 
     def addEnergyEntry(self, entry):
-        print(entry)
-        self.data = pd.concat(
-            [self.data, pd.DataFrame.from_dict([entry])], 
+        log.debug(entry)
+        self.edata = pd.concat(
+            [self.edata, pd.DataFrame.from_dict([entry])], 
             ignore_index=True
         )
-        print("NEW")
-        print(self.data)
+        log.debug(self.edata.tail())
 
 
 class MySQL(AppDB):
@@ -96,13 +136,18 @@ class MySQL(AppDB):
         Session = sessionmaker(bind=self.engine)
         session = Session()
         return session
+ 
+    #    def getCategories(self):
+    #        categories = []
+    #        for cat in self.loadSession().query(self.Transaction.Category).distinct():
+    #            categories.append(cat.Category)
+    #        return categories
 
-
-#    def getCategories(self):
-#        categories = []
-#        for cat in self.loadSession().query(self.Transaction.Category).distinct():
-#            categories.append(cat.Category)
-#        return categories
+    def getTransactions(self):
+        session = self.loadSession()
+        qry = session.query(self.Transaction)
+        trans = pd.read_sql(qry.statement, self.engine)
+        return trans;
 
     def insertTransactions(self, df):
         dfi = df.reset_index()

@@ -1,5 +1,4 @@
 import os
-import logging
 
 from db import MockDB, MySQL
 
@@ -9,5 +8,3 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 #db=MySQL() 
 db=MockDB()
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)

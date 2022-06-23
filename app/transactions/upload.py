@@ -11,7 +11,7 @@ import pandas as pd
 from transactions import categorize
 from transactions.parser import parse_file
 
-from config import db, log
+from config import db
 
 layout = html.Div([
     html.Div(
