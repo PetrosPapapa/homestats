@@ -1,7 +1,7 @@
-import sys
-
-import appsecrets as ss
 import config
+import appsecrets as ss
+
+import sys
 
 import dash
 from dash import html, dcc

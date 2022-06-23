@@ -1,4 +1,7 @@
-import os
+import sys,os
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+sys.path.append(__location__)
 
 from db import MockDB, MySQL
 

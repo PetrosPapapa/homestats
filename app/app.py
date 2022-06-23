@@ -1,7 +1,7 @@
+import config
 import appsecrets as ss
 
 import dash
-import config
 from dash import html
 
 app = dash.Dash(__name__, 
