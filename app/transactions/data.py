@@ -18,7 +18,7 @@ def transactionsByMonth(transactions):
     return transbymonth;
 
 def expensesByMonth(transByMonth):
-    expbymonth = transByMonth.groupby(['Date','Category'],as_index=False).sum()
+    expbymonth = transByMonth.groupby(['Date','Category'],as_index=False).sum().round(2)
     expbymonth = expbymonth.loc[~expbymonth['Category'].isin(db.getNonExpenseCategories())]
     expbymonth['Value'] *= -1
 
