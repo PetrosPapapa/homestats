@@ -1,5 +1,7 @@
 import dash
-from dash import Dash, html, dcc
+from dash import html, dcc, callback
+from dash.dependencies import Input, Output
+
 from energy import viz, meter
 
 dash.register_page(__name__)
@@ -22,4 +24,12 @@ def layout():
         )
     ])
 
-
+@callback(
+    Output('electricity-graph', 'figure'),
+    Output('gas-graph', 'figure'),
+    Input('meter-output', 'children'),
+    prevent_initial_call=True,
+)
+def update_graphs(value):
+    return viz.consumption_graphs()
+    
