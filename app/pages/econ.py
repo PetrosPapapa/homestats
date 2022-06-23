@@ -4,7 +4,7 @@ from dash import html, dcc
 import config
 from transactions import data, viz 
 
-dash.register_page(__name__)
+dash.register_page(__name__, order=2)
 
 def layout():
     transactions=config.db.getTransactions()
@@ -33,3 +33,4 @@ def layout():
             figure=viz.category_pie(transactions),
         ),
   ])
+
