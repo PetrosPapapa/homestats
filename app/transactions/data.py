@@ -44,3 +44,21 @@ def balanceByMonth(transByMonth):
     log.debug("Balance by month:")
     log.debug(balancebymonth)
     return balancebymonth;
+
+def cumBalanceByMonth(transByMonth):
+    cumbalancebymonth = transByMonth.loc[~transByMonth['Category'].isin(['TRANSFER'])]
+    cumbalancebymonth = cumbalancebymonth.groupby(['Date']).sum().cumsum().reset_index()
+
+    # drop the most recent month as it will usually be incomplete
+    cumbalancebymonth = cumbalancebymonth.drop(cumbalancebymonth.index[len(cumbalancebymonth) - 1])
+
+    cumbalancebymonth["Smooth"] = np.polyval(np.polyfit(
+        range(len(cumbalancebymonth['Date'])),
+        cumbalancebymonth['Value'].values, 
+        5
+    ), range(len(cumbalancebymonth['Date'])))
+
+
+    log.debug("Cumulative balance by month:")
+    log.debug(cumbalancebymonth)
+    return cumbalancebymonth;

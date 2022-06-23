@@ -57,6 +57,11 @@ if __name__ == '__main__':
                 id='month_balance',
                 figure=tviz.month_balance_graph(transactionsByMonth)
             ),
+
+            dcc.Graph(
+                id='month_cumbalance',
+                figure=tviz.month_cumulative_graph(transactionsByMonth)
+            ),
             
         ])
     else:
