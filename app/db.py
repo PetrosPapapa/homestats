@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, datetime, timedelta
 
 import pandas as pd
 
@@ -33,20 +33,44 @@ class AppDB():
         raise NotImplementedError
     def getEnergyData(self):
         raise NotImplementedError
+    def lastEnergyEntry(self):
+        raise NotImplementedError
+    def addEnergyEntry(self, entry):
+        raise NotImplementedError
+
 
 class MockDB(AppDB):
+
+    def __init__(self):
+        self.mock_months=60
+        l = self.mock_months
+        d = {
+            "address": [ss.energy["address"]] * l, 
+            "date": pd.date_range(date.today() - timedelta(days=(l+1) * 30), periods=l, freq="M").tolist(),
+            "electricity": [x * l * x for x in range(l)],
+            "gas": [x * l * (x+5) for x in range(l)] 
+        }
+        self.data = pd.DataFrame(d)
+        print(self.data)
+    
     def insertTransactions(self, df):
         print(df)
 
     def getEnergyData(self):
-        l=60
-        data = {
-            "address": [ss.energy["address"]] * l, 
-            "date": pd.date_range(datetime.datetime.today(), periods=l, freq="M").tolist(),
-            "electricity": [x * l * x for x in range(l)],
-            "gas": [x * l * (x+5) for x in range(l)] 
-        }
-        return pd.DataFrame(data)
+        return self.data
+
+    def lastEnergyEntry(self):
+        return self.data.iloc[-1].to_dict()
+
+    def addEnergyEntry(self, entry):
+        print(entry)
+        self.data = pd.concat(
+            [self.data, pd.DataFrame.from_dict([entry])], 
+            ignore_index=True
+        )
+        print("NEW")
+        print(self.data)
+
 
 class MySQL(AppDB):
     def __init__(self):
@@ -90,3 +114,14 @@ class MySQL(AppDB):
         qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.asc())
         readings = pd.read_sql(qry.statement, self.engine)
         return readings;
+
+    def lastEnergyEntry(self):
+        session = self.loadSession()
+        qry = session.query(self.Energy).filter(self.Energy.address == ss.energy["address"]).order_by(self.Energy.date.desc()).first()
+        return vars(qry);
+
+    def addEnergyEntry(self, entry):
+        eentry = self.Energy(**entry)
+        session = self.loadSession()
+        session.add(eentry)
+        session.commit()
