@@ -28,6 +28,16 @@ def expensesByMonth(transByMonth):
     log.debug(expbymonth)
     return expbymonth;
 
+def incomeByMonth(transByMonth):
+    inbymonth = transByMonth.loc[transByMonth['Category'].isin(["INCOME"])]
+    inbymonth = inbymonth.groupby(['Date'], as_index=False).sum().round(2)
+    inbymonth = inbymonth.rename(columns={"Value": "Income"})
+
+    #expbymonth=expbymonth.set_index(['Date', 'Category']).unstack(1,fill_value=0)
+    log.debug("Income by month:")
+    log.debug(inbymonth)
+    return inbymonth;
+
 def balanceByMonth(transByMonth):
     balancebymonth = transByMonth.loc[~transByMonth['Category'].isin(['TRANSFER'])]
     balancebymonth = balancebymonth.groupby(['Date'], as_index=False).sum()

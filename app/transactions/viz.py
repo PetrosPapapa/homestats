@@ -1,4 +1,5 @@
 import plotly.express as px
+import plotly.graph_objects as go
 from transactions import data
 
 def category_pie(transactions):
@@ -10,14 +11,15 @@ def category_pie(transactions):
 
 def month_bars(transByMonth):
     df = data.expensesByMonth(transByMonth)
-    fig = px.bar(df, 
+    fig1 = px.bar(df, 
                   y="Value", 
                   x="Date", 
                   color='Category', 
                   orientation='v',
                   text='Value',
                   )
-    fig.update_layout(
+
+    fig1.update_layout(
         xaxis=dict(
             rangeselector=dict(
                 buttons=list([
@@ -51,8 +53,16 @@ def month_bars(transByMonth):
         )
     )
 
-    fig.update_yaxes(minor=dict(ticks="inside", showgrid=True))
+    fig1.update_yaxes(minor=dict(ticks="inside", showgrid=True))
 
+    dfin = data.incomeByMonth(transByMonth)
+    fig2 = px.line(dfin, 
+                   x="Date", 
+                   y="Income",
+                   color_discrete_sequence=["rgba(0, 180, 5, 0.5)"],
+                   )
+
+    fig=go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
     return fig
 
 
@@ -100,6 +110,7 @@ def month_balance_graph(transByMonth):
     )
 
     fig.update_yaxes(minor=dict(ticks="inside", showgrid=True))
+    fig.update_xaxes(minor=dict(ticks="inside", showgrid=True))
     fig.update_traces(patch={"line": {"dash": 'dash'}}, selector={"legendgroup": "Smooth"}) 
 
     mean = round(df['Value'].mean(), 2)
@@ -159,6 +170,7 @@ def month_cumulative_graph(transByMonth):
     )
 
     fig.update_yaxes(minor=dict(ticks="inside", showgrid=True))
+    fig.update_xaxes(minor=dict(ticks="inside", showgrid=True))
     fig.update_traces(patch={"line": {"dash": 'dash'}}, selector={"legendgroup": "Smooth"}) 
 
     mean = round(df['Value'].mean(), 2)
