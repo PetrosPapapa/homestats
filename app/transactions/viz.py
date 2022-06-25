@@ -56,14 +56,21 @@ def month_bars(transByMonth):
     fig1.update_yaxes(minor=dict(ticks="inside", showgrid=True))
 
     dfin = data.incomeByMonth(transByMonth)
-    fig2 = px.line(dfin, 
-                   x="Date", 
-                   y="Income",
-                   color_discrete_sequence=["rgba(0, 180, 5, 0.5)"],
-                   )
+    fig1.add_trace(go.Scatter(x=dfin['Date'], y=dfin['Income'],
+                    mode='lines+markers',
+                    name='Income',
+                    line=dict(color="rgba(0, 180, 5, 0.5)"),
+                    ))
 
-    fig=go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
-    return fig
+#    fig.update_layout(legend=dict(
+#        orientation="h",
+#        yanchor="bottom",
+#        y=1.02,
+#        xanchor="right",
+#        x=1
+#    ))
+
+    return fig1
 
 
 def month_balance_graph(transByMonth):
