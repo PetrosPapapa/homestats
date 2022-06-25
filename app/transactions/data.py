@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 import pandas as pd
 import numpy as np
 
@@ -13,9 +13,9 @@ def expensesByCategory(transactions):
     log.debug(expbycat)
     return expbycat;
 
-def transactionsByMonth(transactions):
+def transactionsByMonth(transactions, firstDayOfMonth=17):
     transbymonth = transactions[['Date','Category','Value']]
-    transbymonth['Date'] = transbymonth['Date'].apply(lambda x: x.strftime('%Y-%m'))
+    transbymonth['Date'] = transbymonth['Date'].apply(lambda x: (x - timedelta(days=firstDayOfMonth-1)).strftime('%Y-%m'))
     return transbymonth;
 
 def expensesByMonth(transByMonth):

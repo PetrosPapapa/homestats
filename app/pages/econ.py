@@ -2,13 +2,14 @@ import dash
 from dash import html, dcc
 
 import config
+import appsecrets as ss
 from transactions import data, viz 
 
 dash.register_page(__name__, order=2)
 
 def layout():
     transactions=config.db.getTransactions()
-    transactionsByMonth=data.transactionsByMonth(transactions)
+    transactionsByMonth=data.transactionsByMonth(transactions, ss.transactions["firstDayOfMonth"])
     
     return html.Div(children=[
   

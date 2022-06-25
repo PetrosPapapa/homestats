@@ -28,8 +28,11 @@ transactions = {
         "TAX",
         "TRANSFER",
     ],
+
     "non_expense_categories": [
         'INCOME', 
         'TRANSFER', 
-    ]
+    ],
+
+    "firstDayOfMonth": 17
 }
