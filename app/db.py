@@ -12,30 +12,9 @@ from log import log
 
 class AppDB():
     def getCategories(self):
-        return [
-            "UNKNOWN",
-            "BILLS",
-            "CAR",
-            "CASH",
-            "INCOME",
-            "OTHER",
-            "PHONE",
-            "RENT",
-            "SCHOOL",
-            "SHOPPING",
-            "SUPERMARKET",
-            "TAX",
-            "TICKETS",
-            "TRANSFER",
-            "UNIVERSITY",
-        ]
-
+        return ss.transactions["categories"]
     def getNonExpenseCategories(self):
-        return [
-            'INCOME', 
-            'TRANSFER', 
-            'UNIVERSITY'
-        ]
+        return ss.transactions["non_expense_categories"]
         
     def getTransactions(self):
         raise NotImplementedError
