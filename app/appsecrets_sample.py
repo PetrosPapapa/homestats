@@ -13,3 +13,26 @@ db = {
 energy = {
     "address": "someaddress"
 }
+
+transactions = {
+    "categories": [
+        "UNKNOWN",
+        "BILLS",
+        "CASH",
+        "INCOME",
+        "OTHER",
+        "RENT",
+        "SCHOOL",
+        "SHOPPING",
+        "SUPERMARKET",
+        "TAX",
+        "TRANSFER",
+    ],
+
+    "non_expense_categories": [
+        'INCOME', 
+        'TRANSFER', 
+    ],
+
+    "firstDayOfMonth": 17
+}

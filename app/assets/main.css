@@ -38,3 +38,13 @@ button[disabled]{
     color: #555555;
     font-size: 8pt;
 }
+
+.category_pie {
+    width: 33vw;
+    height: 30em;
+}
+
+.month_bars {
+    height: 80vh;
+    min-height: 500px;
+}

@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 
 from energy import viz, meter
 
-dash.register_page(__name__)
+dash.register_page(__name__, order=1)
 
 def layout():
     (efig, gfig) = viz.consumption_graphs()

@@ -1,8 +1,9 @@
-import sys
+import sys, os
 import re
 import csv
+import config
 
-reader = csv.reader(open('app/transactions/categories.csv','r'), delimiter=',', quotechar="\"")
+reader = csv.reader(open(os.path.join(config.__location__,'transactions/categories.csv'),'r'), delimiter=',', quotechar="\"")
 reader_rows = [(row[0], row[1]) for row in reader if len(row)==2]
 
 def categorize_from_rows(item, rows):
