@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=5s
 ExecStartPre=-/usr/bin/docker stop homestats
-ExecStart=/usr/bin/docker start homestats
+ExecStart=/usr/bin/docker start --attach homestats
 ExecStop=-/usr/bin/docker stop homestats
 
 [Install]
