@@ -198,6 +198,6 @@ def enable_submit(data):
     State({'type': 'transaction_table', 'index': MATCH}, 'data'),
     prevent_initial_call=True,
 )
-def enable_submit(clicks, data):
+def do_submit(clicks, data):
     db.insertTransactions(pd.DataFrame(data))
     return 'Transactions submitted.'
