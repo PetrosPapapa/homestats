@@ -11,6 +11,18 @@ SET time_zone = "+00:00";
 
 
 --
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `regex` varchar(60) NOT NULL,
+  `category` varchar(12) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `energy`
 --
 
@@ -39,6 +51,13 @@ CREATE TABLE `transactions` (
   `Category` varchar(12) NOT NULL DEFAULT 'UNKNOWN'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
+
 --
 -- Indexes for table `energy`
 --
@@ -51,6 +70,12 @@ ALTER TABLE `energy`
 ALTER TABLE `transactions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Category` (`Category`);
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `transactions`

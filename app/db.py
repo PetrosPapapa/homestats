@@ -26,6 +26,8 @@ class AppDB():
         raise NotImplementedError
     def addEnergyEntry(self, entry):
         raise NotImplementedError
+    def getCategoryRegexes(self):
+        raise NotImplementedError
 
 
 class MockDB(AppDB):
@@ -43,6 +45,14 @@ class MockDB(AppDB):
             "electricity": [x * l * x for x in range(l)],
             "gas": [x * l * (x+5) for x in range(l)] 
         }
+
+        categs = {
+            "id": range(2),
+            "regex": ["foo.*", "bar.*"],
+            "category": ["foo", "bar"]
+        }
+
+        self.categRegexes =  pd.DataFrame(categs)
 
         self.edata = pd.DataFrame(ed)
         log.debug(self.edata.head())
@@ -97,12 +107,16 @@ class MockDB(AppDB):
         )
         log.debug(self.edata.tail())
 
+    def getCategoryRegexes(self):
+        return self.categRegexes;
+
 
 class MySQL(AppDB):
     def __init__(self):
         self.engine = create_engine(f'mysql+pymysql://{ss.db["username"]}:{ss.db["password"]}@{ss.db["host"]}:{ss.db["port"]}/{ss.db["database"]}', pool_recycle=3600) #, echo=True)
 
         self.Base=declarative_base(self.engine)
+
         class Transaction(self.Base):
             """"""
             __tablename__ = ss.db["transactions_tbl"]
@@ -115,6 +129,11 @@ class MySQL(AppDB):
             __table_args__ = {'autoload': True}
         self.Energy=Energy
 
+        class CategoryRegex(self.Base):
+            """"""
+            __tablename__ = ss.db["categories_tbl"]
+            __table_args__ = {'autoload': True}
+        self.CategoryRegex=CategoryRegex
 
     def loadSession(self):
         """"""
@@ -158,3 +177,11 @@ class MySQL(AppDB):
         session = self.loadSession()
         session.add(eentry)
         session.commit()
+
+    def getCategoryRegexes(self):
+        session = self.loadSession()
+        qry = session.query(self.CategoryRegex)
+        cats = pd.read_sql(qry.statement, con=self.engine)
+        log.debug(cats.head())
+        log.debug(cats.tail())
+        return cats;

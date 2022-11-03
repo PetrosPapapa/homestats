@@ -7,7 +7,8 @@ db = {
     "username": "uname",
     "password": "password"
     "transactions_tbl": "transactions",
-    "energy_tbl": "energy"
+    "energy_tbl": "energy",
+    "categories_tbl": "categories"
 }
 
 energy = {

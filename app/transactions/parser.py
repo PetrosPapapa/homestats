@@ -1,6 +1,7 @@
 import base64
 import io
 import pandas as pd
+import config
 
 from transactions import categorize
 
@@ -49,7 +50,8 @@ def parse_csv(content):
    df = df.sort_values(by=["Date"], ascending=True)
    
    # Add category
-   df['Category'] = df.apply (lambda row: categorize(row['Description']), axis=1)
+   regexes = config.db.getCategoryRegexes()
+   df['Category'] = df.apply (lambda row: categorize(row['Description'], regexes), axis=1)
    
    # Unknown positives are income
    df.loc[(df['Category']=="UNKNOWN") & (df['Value']>0), 'Category'] = "INCOME"
