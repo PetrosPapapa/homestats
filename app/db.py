@@ -74,6 +74,8 @@ class MockDB(AppDB):
     def randomTransaction(self, i):
         categories = [c for c in self.getCategories() if c != "UNKNOWN" and c != "TRANSFER"]
         cat = categories[random.randrange(0,len(categories))]
+        accounts = ["101010-00001234", "101010-00005678", "101010-00009101"]
+        acct = accounts[random.randrange(0,len(accounts))]
         return {
             "id": i,
             "Date": (
@@ -83,7 +85,7 @@ class MockDB(AppDB):
             "Value": self.randomTValue(cat),
             "Balance": 0,
             "Account Name": "someAccount",
-            "Account Number": "101010-00001234",
+            "Account Number": acct,
             "Category": cat
         }
 
