@@ -9,8 +9,8 @@ def category_pie(transactions):
                   names='Category'
                   )
 
-def month_bars(transByMonth):
-    df = data.expensesByMonth(transByMonth)
+def month_bars(transByMonth, accounts=[]):
+    df = data.expensesByMonth(transByMonth, accounts)
     fig1 = px.bar(df, 
                   y="Value", 
                   x="Date", 

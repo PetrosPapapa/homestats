@@ -13,13 +13,25 @@ def expensesByCategory(transactions):
     log.debug(expbycat)
     return expbycat;
 
+def accounts(transactions):
+    accts = transactions[['Account Name','Account Number']].drop_duplicates() 
+    result = pd.DataFrame({
+        "label": accts['Account Name'] + ' - ' + accts['Account Number'],
+        "value": accts['Account Number']
+    }).reset_index(drop=True)
+    return result;
+
 def transactionsByMonth(transactions, firstDayOfMonth=17):
-    transbymonth = transactions[['Date','Category','Value']]
+    transbymonth = transactions[['Date','Category','Value','Account Number']]
     transbymonth['Date'] = transbymonth['Date'].apply(lambda x: (x - timedelta(days=firstDayOfMonth-1)).strftime('%Y-%m'))
     return transbymonth;
 
-def expensesByMonth(transByMonth):
-    expbymonth = transByMonth.groupby(['Date','Category'], as_index=False).sum().round(2)
+def expensesByMonth(transByMonth, accounts=[]):
+    if not accounts:
+        trans = transByMonth
+    else:
+        trans = transByMonth[transByMonth['Account Number'].isin(accounts)]
+    expbymonth = trans.groupby(['Date','Category'], as_index=False).sum().round(2)
     expbymonth = expbymonth.loc[~expbymonth['Category'].isin(db.getNonExpenseCategories())]
     expbymonth['Value'] *= -1
 
