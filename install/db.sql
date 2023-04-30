@@ -17,7 +17,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `categories` (
   `id` int(10) UNSIGNED NOT NULL,
   `regex` varchar(60) NOT NULL,
-  `category` varchar(12) NOT NULL
+  `category` varchar(12) NOT NULL,
+  `corder` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

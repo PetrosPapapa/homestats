@@ -182,7 +182,7 @@ class MySQL(AppDB):
 
     def getCategoryRegexes(self):
         session = self.loadSession()
-        qry = session.query(self.CategoryRegex)
+        qry = session.query(self.CategoryRegex).order_by(self.CategoryRegex.corder.asc())
         cats = pd.read_sql(qry.statement, con=self.engine)
         log.debug(cats.head())
         log.debug(cats.tail())
